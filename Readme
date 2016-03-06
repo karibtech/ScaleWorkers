@@ -1,0 +1,34 @@
+Aim:
+
+  > Provide an automatic way of scaling workers for processing queues
+  > A common framework for using workers of different backends
+  > Pluggable architecture for plugging in different workers(DJ, resque etc)
+  > Auto scale plugin to be reused by different implementations
+
+Dependency:
+
+  > usagewatch
+
+Drawbacks:
+  > Currently supports only Linux machines
+
+Plan:
+  > Auto scale Adapter
+  > Pluggable architecture
+  > Common Framework
+  > Rake tasks
+  > Capistrano integrations
+  > Configuration settings
+  > DJ integration
+  > Notification support
+  > Tests
+  > Documentation
+  > Heroku
+
+Steps:
+
+require 'scale_workers'
+
+ScaleWorkers.configure{|config| config.count_procedure = lambda{|queue, max| p 'count'; return 5 } }
+auto_scale = ScaleWorkers::AutoScale.new
+auto_scale.monitor
