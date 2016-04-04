@@ -1,0 +1,6 @@
+namespace :scale_workers do
+  desc "Start Scale workers"
+  task :monitor => :environment do
+    ScaleWorkers::AutoScale.new.monitor
+  end
+end

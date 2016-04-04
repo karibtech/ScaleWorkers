@@ -23,7 +23,7 @@ module ScaleWorkers
     end
 
     def monitor
-      # bind_interrupt_listener
+      bind_interrupt_listener
       usage_listener = bind_high_usage_listener
       monitor_workers
     ensure

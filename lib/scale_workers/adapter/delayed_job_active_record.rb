@@ -16,13 +16,13 @@ module ScaleWorkers
       attr_accessor :pid_switch
 
       def initialize
-        pid_switch = 0
+        @pid_switch = 0
       end
 
       def stop_procedure
         lambda do |queue, count|
           say('Inside stop procedure')
-          adapter = ::ScaleWorkers.configuration.adapter
+          adapter = self#::ScaleWorkers.configuration.adapter
           pid_dir = adapter.pid_dir(queue)
           adapter.dj_call(adapter.class::Command::STOP, queue, pid_dir, count)
           sleep(adapter.class::TIMEOUT)
@@ -32,7 +32,7 @@ module ScaleWorkers
       def start_procedure
         lambda do |queue, count|
           say('Inside start procedure')
-          adapter = ::ScaleWorkers.configuration.adapter
+          adapter = self #::ScaleWorkers.configuration.adapter
           adapter.increment_pid_switch
           pid_dir = adapter.pid_dir(queue)
           adapter.dj_call(adapter.class::Command::START, queue, pid_dir, count)
@@ -44,11 +44,11 @@ module ScaleWorkers
       end
 
       def increment_pid_switch
-        ::ScaleWorkers.configuration.adapter.pid = (::ScaleWorkers.configuration.adapter.pid + 1) % PRIME
+        self.pid_switch = (self.pid_switch + 1) % PRIME
       end
 
       def pid_dir(queue)
-        File.join(Rails.root.to_s, "tmp", "pids", "#{queue}.#{self.pid}")
+        File.join(Rails.root.to_s, "tmp", "pids", "#{queue}.#{self.pid_switch}")
       end
 
       def dj_call(command, queue, pid_dir, count)
@@ -56,6 +56,9 @@ module ScaleWorkers
         `cd #{Rails.root.to_s}; RAILS_ENV=#{Rails.env} #{::ScaleWorkers.configuration.worker_executable_path} --queue='#{queue}' -p'#{queue}' --pid-dir=#{pid_dir} -n#{count} #{command}`
       end
 
+      def pid_switch
+        @pid_switch ||= 0
+      end
     end
 
   end
